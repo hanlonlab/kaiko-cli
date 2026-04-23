@@ -1,0 +1,12 @@
+[model_providers.vllm]
+name = "vllm"
+base_url = "http://hfsl-hanlon2-32.fsc.stevens.edu:8000/v1"
+env_key = "VLLM_API_KEY"
+wire_api = "responses"
+stream_idle_timeout_ms = 10000000
+
+[profiles.local]
+name = "local"
+model_provider="vllm"
+model = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+

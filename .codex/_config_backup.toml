@@ -1,0 +1,25 @@
+env_key = "OPENAI_API_KEY"
+
+model = "gpt-5-nano"
+model_reasoning_effort = "low"
+personality = "pragmatic" # or "friendly" or "none"
+approval_policy = "on-request"
+web_search = "cached"
+log_dir = "./codex-logs"
+
+sandbox_mode = "workspace-write"
+
+[windows]
+sandbox = "elevated"   # Recommended
+# sandbox = "unelevated" # Fallback if admin permissions/setup are unavailable
+
+[model_providers.vllm]
+name = "vllm"
+base_url = "http://hfsl-hanlon2-32.fsc.stevens.edu:8000/v1"
+env_key = "OPENAI_API_KEY"
+
+[profiles.local]
+name = "qwen"
+model_provider="vllm"
+model = "qwen"
+
