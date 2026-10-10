@@ -1,0 +1,9 @@
+[project]
+name = "kaiko-cli"
+version = "0.1.0"
+description = "A convenience CLI for downloading data from the Kaiko REST API."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "httpx2>=2.12.0",
+]
