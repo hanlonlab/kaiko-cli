@@ -16,7 +16,7 @@ from zoneinfo import ZoneInfo
 
 import httpx2
 
-# TODO bulk exchange downloads, cache for reference data api calls, change DEBUG flag to verbosity setting, add file like --single-output that produces a single file as output with add'l cols from filenames, move inst_list aggregation out of memory, parallelize downloads/async redesign, write data to a .part file, integrate fetch_ref into client + combine with fetch_data?
+# TODO split trades/agg query params into separate dataclasses, add bulk exchange downloads with *, cache for reference data api calls, change DEBUG flag to verbosity setting, add file like --single-output that produces a single file as output with add'l cols from filenames, move inst_list aggregation out of memory, parallelize downloads/async redesign, write data to a .part file, integrate fetch_ref into client + combine with fetch_data?
 # note for async: "Our standard Rest API is limited to 6000 requests per API key per minute. If you query the API beyond that threshold, a 429 error message will occur."
 
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "t", "1")
@@ -268,8 +268,8 @@ def generate_config_default(
     default_path_params["api_version"] = "v2"
     agg_toml = "\n".join([
         "[agg]",
-        *[f"{k} = {v!r}" for k,v in default_path_params.items()],
-        *[f"{k} = {v!r}" for k,v in default_query_params.items()]
+        *[f"{k} = {v!r}" for k,v in default_path_params.items() if v is not None],
+        *[f"{k} = {v!r}" for k,v in default_query_params.items() if v is not None]
     ])
 
     with open(config_path, "x") as f:
@@ -387,11 +387,6 @@ def load_config(
                     continue
                 query_end_time = min(query_end_time, trade_end_time)
             query_start_time = max(query_start_time, trade_start_time)
-
-            # limiter for download restart - remove after
-            limit = "2025-04-01T00:00:00.000000+00:00"
-            if c["instrument_class"] == "option_combo" and query_start_time < datetime.fromisoformat(limit).astimezone(ZoneInfo("UTC")):
-                continue
 
             resolved_conf = c.copy() | {
                 "instrument": inst["code"],
