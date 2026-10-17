@@ -247,29 +247,37 @@ def generate_config_default(
     end_time_default = datetime.combine(tues_before_thanksgiving, time(11, 0, 0), tzinfo=et_tz).isoformat(timespec="microseconds")
 
     # write file with default params
-    default_path_params = asdict(PathParams(
+    trades_path_defaults = asdict(PathParams(
         exchange=["cbse","bnus"],
-        instrument=["btc-usd","eth-usd"]
+        instrument=["btc-usd","eth-usd"],
+        summary_type="trades",
+        api_version="v3"
     ))
-    default_query_params = asdict(QueryParams(
+    trades_query_defaults = asdict(QueryParams(
         start_time=start_time_default,
         end_time=end_time_default
     ))
-
-    default_path_params["summary_type"] = "trades"
-    default_path_params["api_version"] = "v3"
     trades_toml = "\n".join([
         "[trades]",
-        *[f"{k} = {v!r}" for k,v in default_path_params.items() if k not in ["interval"]],
-        *[f"{k} = {v!r}" for k,v in default_query_params.items() if k not in ["interval"]]
+        *[f"{k} = {v!r}" for k,v in trades_path_defaults.items() if k not in ["interval"]],
+        *[f"{k} = {v!r}" for k,v in trades_query_defaults.items() if k not in ["interval"]]
     ])
 
-    default_path_params["summary_type"] = f"aggregations/{aggregation_type}"
-    default_path_params["api_version"] = "v2"
+    agg_path_defaults = asdict(PathParams(
+        exchange=["cbse","bnus"],
+        instrument=["btc-usd","eth-usd"],
+        summary_type=f"aggregations/{aggregation_type}",
+        api_version="v2"
+    ))
+    agg_query_defaults = asdict(QueryParams(
+        start_time=start_time_default,
+        end_time=end_time_default,
+        interval="1m"
+    ))
     agg_toml = "\n".join([
         "[agg]",
-        *[f"{k} = {v!r}" for k,v in default_path_params.items() if v is not None],
-        *[f"{k} = {v!r}" for k,v in default_query_params.items() if v is not None]
+        *[f"{k} = {v!r}" for k,v in agg_path_defaults.items() if v is not None],
+        *[f"{k} = {v!r}" for k,v in agg_query_defaults.items() if v is not None]
     ])
 
     with open(config_path, "x") as f:
